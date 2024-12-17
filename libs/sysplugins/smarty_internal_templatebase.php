@@ -19,11 +19,11 @@
  * The following methods will be dynamically loaded by the extension handler when they are called.
  * They are located in a corresponding Smarty_Internal_Method_xxxx class
  *
- * @method Smarty_Internal_TemplateBase addAutoloadFilters(mixed $filters, string $type = null)
+ * @method Smarty_Internal_TemplateBase addAutoloadFilters(mixed $filters, ?string $type = null)
  * @method Smarty_Internal_TemplateBase addDefaultModifiers(mixed $modifiers)
  * @method Smarty_Internal_TemplateBase addLiterals(mixed $literals)
- * @method Smarty_Internal_TemplateBase createData(Smarty_Internal_Data $parent = null, string $name = null)
- * @method array getAutoloadFilters(string $type = null)
+ * @method Smarty_Internal_TemplateBase createData(?Smarty_Internal_Data $parent = null, ?string $name = null)
+ * @method array getAutoloadFilters(?string $type = null)
  * @method string getDebugTemplate()
  * @method array getDefaultModifier()
  * @method array getLiterals()
@@ -35,7 +35,7 @@
  * @method Smarty_Internal_TemplateBase registerDefaultPluginHandler(callback $callback)
  * @method Smarty_Internal_TemplateBase registerDefaultTemplateHandler(callback $callback)
  * @method Smarty_Internal_TemplateBase registerResource(string $name, mixed $resource_handler)
- * @method Smarty_Internal_TemplateBase setAutoloadFilters(mixed $filters, string $type = null)
+ * @method Smarty_Internal_TemplateBase setAutoloadFilters(mixed $filters, ?string $type = null)
  * @method Smarty_Internal_TemplateBase setDebugTemplate(string $tpl_name)
  * @method Smarty_Internal_TemplateBase setDefaultModifiers(mixed $modifiers)
  * @method Smarty_Internal_TemplateBase setLiterals(mixed $literals)
@@ -140,11 +140,11 @@ abstract class Smarty_Internal_TemplateBase extends Smarty_Internal_Data
      * @api  Smarty::isCached()
      * @link https://www.smarty.net/docs/en/api.is.cached.tpl
      *
-     * @param null|string|\Smarty_Internal_Template $template   the resource handle of the template file or template
-     *                                                          object
-     * @param mixed                                 $cache_id   cache id to be used with this template
-     * @param mixed                                 $compile_id compile id to be used with this template
-     * @param object                                $parent     next higher level of Smarty variables
+     * @param string|Smarty_Internal_Template|null $template   the resource handle of the template file or
+     *                                                          template object Default null
+     * @param string|null                          $cache_id   cache id to be used with this template Default null
+     * @param string|null                          $compile_id compile id to be used with this template Default null
+     * @param object|null                          $parent     next higher level of Smarty variables Default null
      *
      * @return bool cache status
      * @throws \Exception

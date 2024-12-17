@@ -377,8 +377,8 @@ abstract class Smarty_Internal_TemplateCompilerBase
      * Method to compile a Smarty template
      *
      * @param Smarty_Internal_Template                  $template template object to compile
-     * @param bool                                      $nocache  true is shall be compiled in nocache mode
-     * @param null|Smarty_Internal_TemplateCompilerBase $parent_compiler
+     * @param bool|null                                 $nocache flag whether to be compiled in nocache mode Default null
+     * @param Smarty_Internal_TemplateCompilerBase|null $parent_compiler Default null
      *
      * @return bool true if compiling succeeded, false if it failed
      * @throws \Exception
@@ -386,7 +386,7 @@ abstract class Smarty_Internal_TemplateCompilerBase
     public function compileTemplate(
         Smarty_Internal_Template $template,
         $nocache = null,
-        Smarty_Internal_TemplateCompilerBase $parent_compiler = null
+        ?Smarty_Internal_TemplateCompilerBase $parent_compiler = null
     ) {
         // get code frame of compiled template
         $_compiled_code = $template->smarty->ext->_codeFrame->create(
@@ -407,9 +407,9 @@ abstract class Smarty_Internal_TemplateCompilerBase
     /**
      * Compile template source and run optional post filter
      *
-     * @param \Smarty_Internal_Template             $template
-     * @param null|bool                             $nocache flag if template must be compiled in nocache mode
-     * @param \Smarty_Internal_TemplateCompilerBase $parent_compiler
+     * @param Smarty_Internal_Template                  $template template object to compile
+     * @param bool|null                                 $nocache flag whether template to be compiled in nocache mode Default null
+     * @param Smarty_Internal_TemplateCompilerBase|null $parent_compiler Default null
      *
      * @return string
      * @throws \Exception
@@ -417,7 +417,7 @@ abstract class Smarty_Internal_TemplateCompilerBase
     public function compileTemplateSource(
         Smarty_Internal_Template $template,
         $nocache = null,
-        Smarty_Internal_TemplateCompilerBase $parent_compiler = null
+        ?Smarty_Internal_TemplateCompilerBase $parent_compiler = null
     ) {
         try {
             // save template object in compiler class
@@ -429,7 +429,7 @@ abstract class Smarty_Internal_TemplateCompilerBase
                 $this->smarty->_debug->start_compile($this->template);
             }
             $this->parent_compiler = $parent_compiler ? $parent_compiler : $this;
-            $nocache = isset($nocache) ? $nocache : false;
+            $nocache = !empty($nocache);
             if (empty($template->compiled->nocache_hash)) {
                 $template->compiled->nocache_hash = $this->nocache_hash;
             } else {
@@ -453,17 +453,27 @@ abstract class Smarty_Internal_TemplateCompilerBase
                     );
             }
             $this->smarty->_current_file = $this->template->source->filepath;
-            // get template source
             if (!empty($this->template->source->components)) {
-                // we have array of inheritance templates by extends: resource
-                // generate corresponding source code sequence
-                $_content =
-                    Smarty_Internal_Compile_Extends::extendsSourceArrayCode($this->template);
+                // we have ancestor resources derived from an extends: resource
+                $_compiled_code = "<?php \$_smarty_tpl->_loadInheritance();\n\$_smarty_tpl->inheritance->init(\$_smarty_tpl, true); ?>";
+                $ckeys = array_keys($this->template->source->components);
+                for ($i = count($ckeys) - 1; $i >= 0; --$i) {
+                    if ($i == 0) { //highest ancestor
+                        $_compiled_code .= '<?php $_smarty_tpl->inheritance->endChild($_smarty_tpl); ?>';
+                    }
+                    $_compiled_code .= $this->compileTag('include',
+                        [
+                            var_export($this->template->source->components[$ckeys[$i]]->resource, true),
+                            ['scope' => 'parent'],
+                        ]
+                    );
+                }
+                $_compiled_code = $this->postFilter($_compiled_code, $this->template);
             } else {
-                // get template source
+                // no ancestors, get current template source
                 $_content = $this->template->source->getContent();
+                $_compiled_code = $this->postFilter($this->doCompile($this->preFilter($_content), true));
             }
-            $_compiled_code = $this->postFilter($this->doCompile($this->preFilter($_content), true));
             if (!empty($this->required_plugins[ 'compiled' ]) || !empty($this->required_plugins[ 'nocache' ])) {
                 $_compiled_code = '<?php ' . $this->compileRequiredPlugins() . "?>\n" . $_compiled_code;
             }
@@ -601,7 +611,11 @@ abstract class Smarty_Internal_TemplateCompilerBase
      */
     public function compilePHPFunctionCall($name, $parameter)
     {
-        if (!$this->smarty->security_policy || $this->smarty->security_policy->isTrustedPhpFunction($name, $this)) {
+        if (
+            !$this->smarty->security_policy ||
+            $this->smarty->security_policy->isTrustedPhpFunction($name, $this) ||
+            !empty($this->smarty->registered_plugins[Smarty::PLUGIN_FUNCTION][$name][0]) //TODO [0] = callable
+            ) {
             if (strcasecmp($name, 'isset') === 0 || strcasecmp($name, 'empty') === 0
                 || strcasecmp($name, 'array') === 0 || is_callable($name)
             ) {
@@ -1061,9 +1075,9 @@ abstract class Smarty_Internal_TemplateCompilerBase
      * In this case the parser is called to obtain information about expected tokens.
      * If parameter $args contains a string this is used as error message
      *
-     * @param string    $args    individual error message or null
-     * @param string    $line    line-number
-     * @param null|bool $tagline if true the line number of last tag
+     * @param string|null $args    individual error message Default null
+     * @param string|null $line    line-number Default null
+     * @param bool|null   $tagline if true the line number of last tag Default null
      *
      * @throws \SmartyCompilerException when an unexpected token is found
      */

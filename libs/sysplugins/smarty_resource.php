@@ -165,17 +165,17 @@ abstract class Smarty_Resource
      * wrapper for backward compatibility to versions < 3.1.22
      * Either [$_template] or [$smarty, $template_resource] must be specified
      *
-     * @param Smarty_Internal_Template $_template         template object
-     * @param Smarty                   $smarty            smarty object
-     * @param string                   $template_resource resource identifier
+     * @param Smarty_Internal_Template|null $_template         template object Default null
+     * @param Smarty|null                   $smarty            smarty object Default null
+     * @param string                        $template_resource resource identifier Default ''
      *
      * @return \Smarty_Template_Source Source Object
      * @throws \SmartyException
      */
     public static function source(
-        Smarty_Internal_Template $_template = null,
-        Smarty $smarty = null,
-        $template_resource = null
+        ?Smarty_Internal_Template $_template = null,
+        ?Smarty $smarty = null,
+        string $template_resource = ''
     ) {
         return Smarty_Template_Source::load($_template, $smarty, $template_resource);
     }
@@ -193,10 +193,10 @@ abstract class Smarty_Resource
     /**
      * populate Source Object with meta data from Resource
      *
-     * @param Smarty_Template_Source   $source    source object
-     * @param Smarty_Internal_Template $_template template object
+     * @param Smarty_Template_Source        $source    source object
+     * @param Smarty_Internal_Template|null $_template template object Default null
      */
-    abstract public function populate(Smarty_Template_Source $source, Smarty_Internal_Template $_template = null);
+    abstract public function populate(Smarty_Template_Source $source, ?Smarty_Internal_Template $_template = null);
 
     /**
      * populate Source Object with timestamp and exists from Resource
@@ -232,12 +232,6 @@ abstract class Smarty_Resource
         }
     }
 
-    /*
-     * Check if resource must check time stamps when when loading complied or cached templates.
-     * Resources like 'extends' which use source components my disable timestamp checks on own resource.
-     *
-     * @return bool
-     */
     /**
      * Determine basename for compiled filename
      *
@@ -251,7 +245,13 @@ abstract class Smarty_Resource
     }
 
     /**
-     * @return bool
+     * report whether this Resource must check time stamps when loading
+     * compiled or cached templates.
+     * Resources like 'extends' which use 'source components' (an
+     * ancestors-hierarchy) may disable timestamp checks on own resource.
+     * @abstract
+     *
+     * @return bool  Default true
      */
     public function checkTimestamps()
     {
