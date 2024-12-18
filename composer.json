@@ -1,5 +1,7 @@
 {
     "name": "smarty/smarty",
+    "version": "v4.4.2",
+    "version_normalized": "4.4.2.0",
     "type": "library",
     "description": "Smarty - the compiling PHP template engine",
     "keywords": [
