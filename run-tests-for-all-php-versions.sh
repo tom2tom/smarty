@@ -12,4 +12,5 @@ docker-compose run php74 ./run-tests.sh $@ && \
 docker-compose run php80 ./run-tests.sh $@ && \
 docker-compose run php81 ./run-tests.sh $@ && \
 docker-compose run php82 ./run-tests.sh $@ && \
-docker-compose run php83 ./run-tests.sh $@
+docker-compose run php83 ./run-tests.sh $@ && \
+docker-compose run php84 ./run-tests.sh $@
