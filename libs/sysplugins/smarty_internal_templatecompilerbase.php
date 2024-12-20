@@ -614,7 +614,7 @@ abstract class Smarty_Internal_TemplateCompilerBase
         if (
             !$this->smarty->security_policy ||
             $this->smarty->security_policy->isTrustedPhpFunction($name, $this) ||
-            !empty($this->smarty->registered_plugins[Smarty::PLUGIN_FUNCTION][$name][0]) //TODO [0] = callable
+            !empty($this->smarty->registered_plugins[Smarty::PLUGIN_FUNCTION][$name][0]) //[0] = callable
             ) {
             if (strcasecmp($name, 'isset') === 0 || strcasecmp($name, 'empty') === 0
                 || strcasecmp($name, 'array') === 0 || is_callable($name)
