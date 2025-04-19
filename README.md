@@ -3,7 +3,7 @@ Smarty is a template engine for PHP, facilitating the separation of presentation
 
 ![CI](https://github.com/smarty-php/smarty/workflows/CI/badge.svg)
 
-This version of Smarty continues the tradition of support for using PHP functions in templates (subject to Security Policy) without deprecation notce.
+This version of Smarty continues the version 3 tradition of support for using PHP functions in templates (subject to Security Policy) without deprecation notice.
 
 This version of Smarty includes backports of the (few) relevant changes in Smarty versions 4.5.x.
 
